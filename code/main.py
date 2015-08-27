@@ -64,7 +64,7 @@ class StochasticDialog(QDialog,form):
         d["min_weight_fraction_leaf"] = float(dialog.min_weight_fraction_leaf.text())
         d["max_depth"] = int(dialog.max_depth.text()) 
         init=None
-        d["random_state"] = str(dialog.random_state.currentText())
+        d["random_state"] = int(dialog.random_state.currentText())
         max_features = str(dialog.max_features.text())
         if max_features!="None":
         	d["max_features"]=int(dialog.max_features.text())
@@ -136,9 +136,35 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		if self.predictModel == "Stochastic_Gradient_boosting":
 			self.stochasticGradienBoosting(xNames,yName)
 
+	"""
 	def stochasticGradienBoosting(self,xNames,yName):
+		names = yName+xNames
+		df = self.data[names]
+
+
+		d= StochasticDialog.getParams()
+		for i in names:
+			#print i
+			if df[i].dtype == "object":
+				df[i] = pd.DataFrame(data={i: np.unique(df[i],return_inverse=True)[1]})
+		X = np.asfortranarray(df[xNames], dtype=np.float32)
+		Y = np.asfortranarray(df[yName], dtype=np.float32)
+		y = Y[:,0]
+		#est = GradientBoostingRegressor(loss=loss,learning_rate=learning_rate,n_estimators=n_estimators,subsample=subsample,min_samples_split=min_samples_split,min_samples_leaf=min_samples_leaf,min_weight_fraction_leaf=min_weight_fraction_leaf,max_depth=max_depth,random_state=random_state,max_features=max_features,alpha=alpha,verbose=verbose,max_leaf_nodes=max_leaf_nodes,warm_start=warm_start)
+		est = GradientBoostingRegressor(n_estimators=3000, max_depth=6, learning_rate=0.04,loss='huber', random_state=0)
+		est.fit(X,y)
+		a = est.feature_importances_
+
+		self.textEdit.append("Relative Importance of the variables: \n")
+
+		for i in range(0,len(a)):
+			self.textEdit.append(str(xNames[i])+" "+str(a[i])+"\n")
+	"""
+
+	def stochasticGradienBoosting(self,xNames,yNames):
+		d= StochasticDialog.getParams()
 		names = yNames+xNames
-		dff = df[names]
+		dff = self.data[names]
 		for i in xNames:
 			if dff[i].dtype=='object':
 				fillvalue = dff[i].value_counts()
@@ -158,13 +184,15 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		Y = np.asfortranarray(dff[yNames], dtype=np.float32)
 		y = Y[:,0]
 		#est = GradientBoostingRegressor(loss=loss,learning_rate=learning_rate,n_estimators=n_estimators,subsample=subsample,min_samples_split=min_samples_split,min_samples_leaf=min_samples_leaf,min_weight_fraction_leaf=min_weight_fraction_leaf,max_depth=max_depth,random_state=random_state,max_features=max_features,alpha=alpha,verbose=verbose,max_leaf_nodes=max_leaf_nodes,warm_start=warm_start)
-		est = GradientBoostingRegressor(n_estimators=100, max_depth=6, learning_rate=0.04,loss='huber', random_state=0)
+		est = GradientBoostingRegressor(n_estimators=d["n_estimators"], max_depth=d["max_depth"], learning_rate=d["learning_rate"],loss=d["loss"], random_state=d["random_state"])
 		est.fit(X,y)
 		a = est.feature_importances_
 		self.textEdit.append("Relative Importance of the variables: \n")
 		for i in range(0,len(a)):
 			self.textEdit.append(str(xNames[i])+" "+str(a[i])+"\n")
-			
+
+
+
 
 	def get_dummies(self,df,var_name):
 		ss = pd.Series(df[var_name].values.ravel()).unique()
