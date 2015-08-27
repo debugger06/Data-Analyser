@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1019</width>
+    <height>709</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="0" column="0" rowspan="2">
+     <layout class="QVBoxLayout" name="verticalLayout_5">
+      <item>
+       <widget class="QFrame" name="frame_2">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_3">
+             <item>
+              <widget class="QTableWidget" name="tableWidget_3"/>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_7">
+               <item>
+                <widget class="QLabel" name="label">
+                 <property name="text">
+                  <string>TextLabel</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_4">
+             <item>
+              <widget class="QTableView" name="tableView_2"/>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="QFrame" name="frame">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <item>
+              <widget class="QTableWidget" name="tableWidget"/>
+             </item>
+             <item>
+              <layout class="QVBoxLayout" name="verticalLayout_2">
+               <item>
+                <spacer name="verticalSpacer_4">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QToolButton" name="toolButton_2">
+                 <property name="text">
+                  <string>&gt;</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QToolButton" name="toolButton">
+                 <property name="text">
+                  <string>&lt;</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="verticalSpacer_6">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <widget class="QTableWidget" name="tableWidget_2"/>
+             </item>
+             <item>
+              <layout class="QVBoxLayout" name="verticalLayout">
+               <item>
+                <spacer name="verticalSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QComboBox" name="comboBox"/>
+               </item>
+               <item>
+                <spacer name="verticalSpacer_2">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QPushButton" name="pushButton">
+                 <property name="text">
+                  <string>Generate</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="verticalSpacer_3">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTextEdit" name="textEdit">
+          <property name="styleSheet">
+           <string notr="true">QTextEdit {font: 10pt &quot;Consolas&quot;;}</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+    <item row="0" column="1">
+     <layout class="QHBoxLayout" name="horizontalLayout_4"/>
+    </item>
+    <item row="1" column="1">
+     <layout class="QHBoxLayout" name="horizontalLayout_3"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1019</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuHi">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionSet_Working_Directory"/>
+    <addaction name="actionRead_CSV"/>
+    <addaction name="actionRead_Tab_Delimited"/>
+    <addaction name="actionRead_STATA"/>
+    <addaction name="actionRead_SPSS"/>
+    <addaction name="actionRead_SAS"/>
+    <addaction name="actionRead_Excel"/>
+    <addaction name="separator"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <widget class="QMenu" name="menuPrepare">
+    <property name="title">
+     <string>Prepare</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuExplorer">
+    <property name="title">
+     <string>Explorer</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuAnalyze">
+    <property name="title">
+     <string>Analyze</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuPredict">
+    <property name="title">
+     <string>Predict</string>
+    </property>
+    <addaction name="actionBusiness_Forcast_SGB"/>
+    <addaction name="actionBusiness_Forecast_Linear"/>
+    <addaction name="actionCustomer_Acquition_SGB"/>
+    <addaction name="actionCustomer_Retention_Binary_Logistics"/>
+    <addaction name="actionCustomer_Segmentation_CART"/>
+    <addaction name="separator"/>
+    <addaction name="actionClassification_and_Regression_Tree"/>
+    <addaction name="actionCustomer_Acquisition_Binary_Logistics"/>
+    <addaction name="actionBusiness_Forcast_Linear"/>
+    <addaction name="actionStochastic_Gradient_Boosting"/>
+   </widget>
+   <addaction name="menuHi"/>
+   <addaction name="menuPrepare"/>
+   <addaction name="menuExplorer"/>
+   <addaction name="menuAnalyze"/>
+   <addaction name="menuPredict"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionSet_Working_Directory">
+   <property name="text">
+    <string>Set Working Directory</string>
+   </property>
+  </action>
+  <action name="actionRead_CSV">
+   <property name="text">
+    <string>Read CSV</string>
+   </property>
+  </action>
+  <action name="actionRead_Tab_Delimited">
+   <property name="text">
+    <string>Read Tab Delimited</string>
+   </property>
+  </action>
+  <action name="actionRead_STATA">
+   <property name="text">
+    <string>Read STATA</string>
+   </property>
+  </action>
+  <action name="actionRead_SPSS">
+   <property name="text">
+    <string>Read SPSS</string>
+   </property>
+  </action>
+  <action name="actionRead_Excel">
+   <property name="text">
+    <string>Read Excel</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="text">
+    <string>Quit</string>
+   </property>
+  </action>
+  <action name="actionBusiness_Forcast_Linear">
+   <property name="text">
+    <string>Linear Regression</string>
+   </property>
+  </action>
+  <action name="actionBusiness_Forcast_SGB">
+   <property name="text">
+    <string>Business Forecast (SGB)</string>
+   </property>
+  </action>
+  <action name="actionCustomer_Acquisition_Binary_Logistics">
+   <property name="text">
+    <string>Binary Logistic Regression</string>
+   </property>
+  </action>
+  <action name="actionCustomer_Acquition_SGB">
+   <property name="text">
+    <string>Customer Acquition(SGB)</string>
+   </property>
+  </action>
+  <action name="actionCustomer_Retention_Binary_Logistics">
+   <property name="text">
+    <string>Customer Retention(Binary Logistics)</string>
+   </property>
+  </action>
+  <action name="actionCustomer_Segmentation_CART">
+   <property name="text">
+    <string>Customer Segmentation(CART)</string>
+   </property>
+  </action>
+  <action name="actionBinary_Logistic_Regression">
+   <property name="text">
+    <string>Binary Logistic Regression</string>
+   </property>
+  </action>
+  <action name="actionClassification_and_Regression_Tree">
+   <property name="text">
+    <string>Classification and Regression Tree</string>
+   </property>
+  </action>
+  <action name="actionStochastic_Gradient_Boosting">
+   <property name="text">
+    <string>Stochastic Gradient Boosting</string>
+   </property>
+  </action>
+  <action name="actionRead_SAS">
+   <property name="text">
+    <string>Read SAS</string>
+   </property>
+  </action>
+  <action name="actionBusiness_Forecast_Linear">
+   <property name="text">
+    <string>Business Forecast (Linear) </string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
