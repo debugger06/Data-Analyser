@@ -179,7 +179,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		
 		for i in names:
 			if dff[i].dtype == "object":
-				dff[i] = pd.DataFrame(data={i: np.unique(df[i],return_inverse=True)[1]})
+				dff[i] = pd.DataFrame(data={i: np.unique(dff[i],return_inverse=True)[1]})
 		X = np.asfortranarray(dff[xNames], dtype=np.float32)
 		Y = np.asfortranarray(dff[yNames], dtype=np.float32)
 		y = Y[:,0]
