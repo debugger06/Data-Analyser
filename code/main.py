@@ -136,30 +136,6 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		if self.predictModel == "Stochastic_Gradient_boosting":
 			self.stochasticGradienBoosting(xNames,yName)
 
-	"""
-	def stochasticGradienBoosting(self,xNames,yName):
-		names = yName+xNames
-		df = self.data[names]
-
-
-		d= StochasticDialog.getParams()
-		for i in names:
-			#print i
-			if df[i].dtype == "object":
-				df[i] = pd.DataFrame(data={i: np.unique(df[i],return_inverse=True)[1]})
-		X = np.asfortranarray(df[xNames], dtype=np.float32)
-		Y = np.asfortranarray(df[yName], dtype=np.float32)
-		y = Y[:,0]
-		#est = GradientBoostingRegressor(loss=loss,learning_rate=learning_rate,n_estimators=n_estimators,subsample=subsample,min_samples_split=min_samples_split,min_samples_leaf=min_samples_leaf,min_weight_fraction_leaf=min_weight_fraction_leaf,max_depth=max_depth,random_state=random_state,max_features=max_features,alpha=alpha,verbose=verbose,max_leaf_nodes=max_leaf_nodes,warm_start=warm_start)
-		est = GradientBoostingRegressor(n_estimators=3000, max_depth=6, learning_rate=0.04,loss='huber', random_state=0)
-		est.fit(X,y)
-		a = est.feature_importances_
-
-		self.textEdit.append("Relative Importance of the variables: \n")
-
-		for i in range(0,len(a)):
-			self.textEdit.append(str(xNames[i])+" "+str(a[i])+"\n")
-	"""
 
 	def stochasticGradienBoosting(self,xNames,yNames):
 		d= StochasticDialog.getParams()
@@ -232,10 +208,12 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 				nonCategorical.append(i)
 		data = ddf[y+nonCategorical]
 		for j in categorical:
-			dummy_b = self.get_dummies(ddf,j)
+			#dummy_b = self.get_dummies(ddf,j)
+			dummy_b = pd.get_dummies(ddf[j],prefix=j)
 			dummy_columns = dummy_b.columns
-			for i in range(1,len(dummy_columns)):
-				data[dummy_columns[i]]=dummy_b[dummy_columns[i]]
+
+		cols = list(dummy_columns[1:len(dummy_columns)])
+		data[cols] = dummy_b[dummy_columns[1:len(dummy_columns)]]
 		data['intercept'] = 1.0
 		columns = data.columns
 		y = columns[0]
@@ -276,119 +254,6 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		self.textEdit.append(str(a))
 		self.textEdit.append("\n")
 		#self.predictModel=""
-
-
-
-
-
-
-	"""
-	def LogisticRegression(self,xNames,yName):
-		#y,X = dmatrices('admit ~ gre + gpa + C(rank)',self.data, return_type = "dataframe")
-		#print X.columns
-		#df = pd.DataFrame(self.data, columns = self.headerName)
-		#Y = pd.DataFrame(y, columns = yName)
-		#print X,Y
-		#print self.data
-		#print self.data[xNames[0]].dtype
-		#print self.data[xNames[1]].dtype
-
-		#df = pd.DataFrame(dta,columns = yName+xNames)
-		names = yName+xNames
-		df = self.data[yName+xNames]
-		categorical = []
-		nonCategorical = []
-	
-		
-		for i in xNames:
-			if self.var_type[i]=="Categorical":
-				categorical.append(i)
-				print i
-			else:
-				nonCategorical.append(i)
-		#print nonCategorical
-		#print categorical
-
-		
-		data = df[yName+nonCategorical]
-		
-		for j in categorical:
-			#dummy_b = pd.get_dummies(df[j],prefix=j)
-			t1 = time.clock()
-			dummy_b = self.get_dummies(df,j)
-			t2 = time.clock()
-			#print "Time took:",t2-t1
-			dummy_columns = dummy_b.columns
-
-			#dat = data.join(dummy_b[dummy_columns[1:len(dummy_columns)]])
-			#bigdata = pd.concat([data, dummy_b[dummy_columns[1:len(dummy_columns)]]])
-			for i in range(1,len(dummy_columns)):
-				data[dummy_columns[i]]=dummy_b[dummy_columns[i]]
-			
-
-			#data = data.join(dummy_b.ix[:, j+'_2':])
-			
-			#data = pd.concat([data,dummy_b[1:len(dummy_columns)]],axis=1)
-		#dummy_b = self.get_dummies(data[yName[0]],yName[0])
-
-
-
-		
-		
-		#print data.head()
-		data['intercept'] = 1.0
-
-		
-		#print data.describe()
-		#print data.std()
-		#print data.hist()
-
-		
-		#plt.show()
-		#df['intercept'] = 1.0
-		train_cols = data.columns[1:]
-		print data[yName[0]].dtype
-
-		try:
-			logit = sm.Logit(data[yName[0]], data[train_cols])
-		except:
-			print "problem with the data set"
-
-		result = logit.fit()
-		print result.summary()
-		#print result.conf_int()
-		#print np.exp(result.params)
-		
-		
-
-		a = df.describe()
-		self.textEdit.append(str(a))
-		self.textEdit.append("\n")
-
-		a = df.std()
-		self.textEdit.append(str(a))
-		self.textEdit.append("\n")
-
-		a = df.hist()
-		self.textEdit.append(str(a))
-		self.textEdit.append("\n")
-
-		a = result.summary()
-		self.textEdit.append(str(a))
-		self.textEdit.append("\n")
-
-		a = result.conf_int()
-		self.textEdit.append(str(a))
-		self.textEdit.append("\n")
-
-		a = np.exp(result.params)
-		self.textEdit.append(str(a))
-		self.textEdit.append("\n")
-		#self.predictModel=""
-	"""
-
-
-		
 		
 
 
