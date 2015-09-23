@@ -222,8 +222,6 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		logit = sm.Logit(data[y], data[x])
 		result = logit.fit()
 		#print result.summary()
-
-		result = logit.fit()
 		print result.summary()
 		#print result.conf_int()
 		#print np.exp(result.params)
