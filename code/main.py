@@ -24,6 +24,7 @@ from PyQt4.QtGui import QDialog
 import time
 import unicodedata
 import time
+import sklearn.linear_model
 
 
 matchers = ['Net','Val','Amnt','Amt','Avg','Num','Tot','Avail','Min','Max']
