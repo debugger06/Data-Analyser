@@ -220,12 +220,21 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		y = columns[0]
 		x = columns[1:len(columns)]
 		print data.head()
-		logit = sm.Logit(data[y], data[x])
-		result = logit.fit()
+		X = data[x].as_matrix()
+		Y = data[y].as_matrix()
+		model = sklearn.linear_model.LogisticRegression()
+		model.fit(X,Y)
+		a = model.coef_
+
+		self.textEdit.append(str(a))
+		self.textEdit.append("\n")
+		#logit = sm.Logit(data[y], data[x])
+		#result = logit.fit()
 		#print result.summary()
-		print result.summary()
+		#print result.summary()
 		#print result.conf_int()
 		#print np.exp(result.params)
+		"""
 		
 		
 
@@ -253,6 +262,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		self.textEdit.append(str(a))
 		self.textEdit.append("\n")
 		#self.predictModel=""
+		"""
 		
 
 
@@ -482,11 +492,38 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		raw_data = savReaderWriter.SavReader(str(self.filename), returnHeader = True) # This is fast
 
 
-		raw_data = spss.SavReader(str(self.filename), returnHeader = True) # This is fast
+		raw_data = savReaderWriter.SavReader(str(self.filename), returnHeader = True) # This is fast
 		raw_data_list = list(raw_data) # this is slow
-		data = pd.DataFrame(raw_data_list) # this is slow
-		data = data.rename(columns=data.loc[0]).iloc[1:]
-		print data.head()
+		df = pd.DataFrame(raw_data_list) # this is slow
+		df = df.rename(columns=df.loc[0]).iloc[1:]
+		print df.head()
+
+		l = list(df.columns)
+		print df.head()
+		head = self.tableWidget_3.horizontalHeader()
+		head.setStretchLastSection(True)
+		nrow = len(df.index)
+		if nrow>100:
+			nrow = 100
+		else:
+			nrow = nrow
+
+		#self.datatable = QtGui.QTableWidget(parent=self)
+		self.tableWidget_3.setColumnCount(len(df.columns))
+		self.tableWidget_3.setRowCount(nrow)
+		for i in range(nrow):
+			for j in range(len(df.columns)):
+				self.tableWidget_3.setItem(i,j,QtGui.QTableWidgetItem(str(df.iget_value(i, j))))
+		self.tableWidget_3.setHorizontalHeaderLabels(l)
+		
+		self.headerName = l
+		self.nonSelectedVariables = self.headerName
+		self.data = df
+		st = str(nrow)+" of "+str(len(df.index))+" rows has been shown"
+		self.label.setText(st)
+		self.label.setVisible(True)
+		self.initDict()
+		self.initComboBox()
 
 
 
