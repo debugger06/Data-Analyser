@@ -269,6 +269,8 @@
     <addaction name="actionBusiness_Forcast_SGB"/>
     <addaction name="actionBusiness_Forecast_Linear"/>
     <addaction name="actionCustomer_Acquition_SGB"/>
+    <addaction name="actionCustomer_Acquisition_Binary"/>
+    <addaction name="actionCustomer_Retention_SGB"/>
     <addaction name="actionCustomer_Retention_Binary_Logistics"/>
     <addaction name="actionCustomer_Segmentation_CART"/>
     <addaction name="separator"/>
@@ -372,6 +374,16 @@
   <action name="actionBusiness_Forecast_Linear">
    <property name="text">
     <string>Business Forecast (Linear) </string>
+   </property>
+  </action>
+  <action name="actionCustomer_Acquisition_Binary">
+   <property name="text">
+    <string>Customer Acquisition(Binary Logistics)</string>
+   </property>
+  </action>
+  <action name="actionCustomer_Retention_SGB">
+   <property name="text">
+    <string>Customer Retention(SGB)</string>
    </property>
   </action>
  </widget>
