@@ -136,6 +136,18 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 
 		if self.predictModel == "Stochastic_Gradient_boosting":
 			self.stochasticGradienBoosting(xNames,yName)
+		if self.predictModel == "Forcast_SGB_Regressor":
+			self.stochasticGradienBoosting(xNames,yName)
+		if self.predictModel == "Forcast_Linear":
+			self.LinearRegression(xNames,yName)
+			
+		if self.predictModel == "Business_Forcast_SGB":
+			self.stochasticGradienBoosting(xNames,yName)
+		if self.predictModel == "Customer_Acquisition_Binary":
+			self.LogisticRegression(xNames,yName)
+
+
+
 
 
 	def stochasticGradienBoosting(self,xNames,yNames):
@@ -266,56 +278,51 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		
 
 
-	def LinearRegression(self,xNames,yName):
-		#y,X = dmatrices('admit ~ gre + gpa + C(rank)',self.data, return_type = "dataframe")
-		#print X.columns
-		#X = pd.DataFrame(x, columns = xNames)
-		#Y = pd.DataFrame(y, columns = yName)
-		#print X,Y
+	def LinearRegression(self,x,y):
+		lst = list(set(y + x))
+		ddf = self.data[lst]
+		#x=["COST","Gender",'Age','Education']
+		#y=["CLICKS"]
+		for i in x:
+			if ddf[i].dtype=='object':
+				fillvalue = ddf[i].value_counts()
+				fillvalue = fillvalue.index[0]
+			else:
+				fillvalue = np.mean(ddf[i])
+			ddf[i] = ddf[i].fillna(fillvalue)
+		for i in y:
+			fillvalue = ddf[i].value_counts()
+			fillvalue = fillvalue.index[0]
+			ddf[i] = ddf[i].fillna(fillvalue)
+		categorical = []
+		nonCategorical = []
+		for i in x:
+			if ddf[i].dtype=="object":
+				categorical.append(i)
+				print i
+			else:
+				print i
+				nonCategorical.append(i)
+		data = ddf[y+nonCategorical]
+		for j in categorical:
+			#dummy_b = self.get_dummies(ddf,j)
+			dummy_b = pd.get_dummies(ddf[j],prefix=j)
+			dummy_columns = dummy_b.columns
+			cols = list(dummy_columns[1:len(dummy_columns)])
+			data[cols] = dummy_b[dummy_columns[1:len(dummy_columns)]]
+		#data['intercept'] = 1.0
+		columns = data.columns
+		y = columns[0]
+		x = columns[1:len(columns)]
+		print data.head()
+		X = data[x].as_matrix()
+		Y = data[y].as_matrix()
+		model = sklearn.linear_model.LinearRegression()
+		model.fit(X,Y)
+		a = model.coef_
 
-		df = self.data[yName+xNames]
-		print df.head()
-
-		for i in xNames:
-			if self.var_type[i]=="Categorical":
-				df[i] = pd.Categorical(df[i]).labels
-		print df.describe()
-		print df.std()
-		print df.hist()
-		#plt.show()
-		#df['intercept'] = 1.0
-		
-		
-		logit = sm.OLS(df[yName], df[xNames])
-		result = logit.fit()
-		print result.summary()
-		print result.conf_int()
-		print np.exp(result.params)
-
-		a = df.describe()
 		self.textEdit.append(str(a))
 		self.textEdit.append("\n")
-
-		a = df.std()
-		self.textEdit.append(str(a))
-		self.textEdit.append("\n")
-
-		a = df.hist()
-		self.textEdit.append(str(a))
-		self.textEdit.append("\n")
-
-		a = result.summary()
-		self.textEdit.append(str(a))
-		self.textEdit.append("\n")
-
-		a = result.conf_int()
-		self.textEdit.append(str(a))
-		self.textEdit.append("\n")
-
-		a = np.exp(result.params)
-		self.textEdit.append(str(a))
-		self.textEdit.append("\n")
-		#self.predictModel=""
 
 
 
@@ -357,6 +364,36 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		self.actionCustomer_Acquisition_Binary_Logistics.triggered.connect(self.Binary_Logistics_Regression)
 		self.actionBusiness_Forcast_Linear.triggered.connect(self.Linear_Regression)
 		self.actionStochastic_Gradient_Boosting.triggered.connect(self.Stochastic_Gradient_boosting)
+		self.actionBusiness_Forecast_Linear.triggered.connect(self.Forcast_Linear)
+		#self.actionStochastic_Gradient_Boosting.triggered.connect(self.Stochastic_Gradient_boosting)
+		self.actionCustomer_Acquition_SGB.triggered.connect(self.Forcast_Linear)
+
+		##Stochastic Gradient Boosting technique: dependent variable is a binary variable (yes/no) to predict the probability (from 0 to 1) that a prospect will become a customer. 
+		self.actionBusiness_Forcast_SGB.triggered.connect(self.Business_Forcast_SGB)
+
+		# Logistic Regression technique where the dependent variable is a binary variable (yes/no) to predict the probability (from 0 to 1) that a prospect will become a customer.
+		self.actionCustomer_Acquisition_Binary.triggered.connect(self.Customer_Acquisition_Binary)
+
+
+	
+	def Forcast_SGB(self):
+		self.predictModel = "Forcast_SGB_Regressor"
+		self.createSelectedTable()
+		self.createNonselectedTable()
+	def Forcast_Linear(self):
+		self.predictModel = "Forcast_Linear"
+		self.createSelectedTable()
+		self.createNonselectedTable()
+	def Business_Forcast_SGB(self):
+		self.predictModel = "Business_Forcast_SGB"
+		self.createSelectedTable()
+		self.createNonselectedTable()
+	def Customer_Acquisition_Binary(self):
+		self.predictModel = "Customer_Acquisition_Binary"
+		self.createSelectedTable()
+		self.createNonselectedTable()
+
+
 
 	def loadSTATA(self):
 		try:
@@ -902,4 +939,35 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 app = QtGui.QApplication(sys.argv)
 myWindow = MyWindowClass(None)
 myWindow.show()
+
+
+"""
+kwfdkfj
+fkajsdfds
+print f hellow world
+print hellow world
+print hellow worldpritnt hellow worldpritnt
+print hellow worldpritnt
+print hellow worldpritnt
+print this is my sample columnheaders
+print hellow worldpritnt
+print hellow worldpritnt
+print hellow worldpritnt
+print hellow worldpritnt
+print hellow worldpritnt
+print hellow worldpritnt
+print hellow worldpritnt
+
+print hellow worldpritnt
+print hellow worldpritnt
+print hellow worldpritnt
+print hellow worldpritnt
+
+
+
+dkafhgprint ff tunks
+lkjfwu
+
+
+"""
 app.exec_()
