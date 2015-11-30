@@ -142,9 +142,16 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 			self.LinearRegression(xNames,yName)
 			
 		if self.predictModel == "Business_Forcast_SGB":
-			self.stochasticGradienBoosting(xNames,yName)
+			self.stochasticGradienBoostingClassifier(xNames,yName)
 		if self.predictModel == "Customer_Acquisition_Binary":
 			self.LogisticRegression(xNames,yName)
+		if self.predictModel == "Customer_Retention_SGB":
+			self.stochasticGradienBoostingClassifier(xNames,yName)
+
+		if self.predictModel == "Customer_Retention_Binary_Logistics":
+			self.LogisticRegression(xNames,yName)
+
+
 
 
 
@@ -174,6 +181,37 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		y = Y[:,0]
 		#est = GradientBoostingRegressor(loss=loss,learning_rate=learning_rate,n_estimators=n_estimators,subsample=subsample,min_samples_split=min_samples_split,min_samples_leaf=min_samples_leaf,min_weight_fraction_leaf=min_weight_fraction_leaf,max_depth=max_depth,random_state=random_state,max_features=max_features,alpha=alpha,verbose=verbose,max_leaf_nodes=max_leaf_nodes,warm_start=warm_start)
 		est = GradientBoostingRegressor(n_estimators=d["n_estimators"], max_depth=d["max_depth"], learning_rate=d["learning_rate"],loss=d["loss"], random_state=d["random_state"])
+		est.fit(X,y)
+		a = est.feature_importances_
+		self.textEdit.append("Relative Importance of the variables: \n")
+		for i in range(0,len(a)):
+			self.textEdit.append(str(xNames[i])+" "+str(a[i])+"\n")
+
+
+	def stochasticGradienBoostingClassifier(self,xNames,yNames):
+		d= StochasticDialog.getParams()
+		names = yNames+xNames
+		dff = self.data[names]
+		for i in xNames:
+			if dff[i].dtype=='object':
+				fillvalue = dff[i].value_counts()
+				fillvalue = fillvalue.index[0]
+			else:
+				fillvalue = np.mean(dff[i])
+			dff[i] = dff[i].fillna(fillvalue)
+		for i in yNames:
+			fillvalue = dff[i].value_counts()
+			fillvalue = fillvalue.index[0]
+			dff[i] = dff[i].fillna(fillvalue)
+		
+		for i in names:
+			if dff[i].dtype == "object":
+				dff[i] = pd.DataFrame(data={i: np.unique(dff[i],return_inverse=True)[1]})
+		X = np.asfortranarray(dff[xNames], dtype=np.float32)
+		Y = np.asfortranarray(dff[yNames], dtype=np.float32)
+		y = Y[:,0]
+		#est = GradientBoostingRegressor(loss=loss,learning_rate=learning_rate,n_estimators=n_estimators,subsample=subsample,min_samples_split=min_samples_split,min_samples_leaf=min_samples_leaf,min_weight_fraction_leaf=min_weight_fraction_leaf,max_depth=max_depth,random_state=random_state,max_features=max_features,alpha=alpha,verbose=verbose,max_leaf_nodes=max_leaf_nodes,warm_start=warm_start)
+		est = GradientBoostingClassifier(n_estimators=d["n_estimators"], max_depth=d["max_depth"], learning_rate=d["learning_rate"],loss=d["loss"], random_state=d["random_state"])
 		est.fit(X,y)
 		a = est.feature_importances_
 		self.textEdit.append("Relative Importance of the variables: \n")
@@ -224,10 +262,9 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 			#dummy_b = self.get_dummies(ddf,j)
 			dummy_b = pd.get_dummies(ddf[j],prefix=j)
 			dummy_columns = dummy_b.columns
-
-		cols = list(dummy_columns[1:len(dummy_columns)])
-		data[cols] = dummy_b[dummy_columns[1:len(dummy_columns)]]
-		data['intercept'] = 1.0
+			cols = list(dummy_columns[1:len(dummy_columns)])
+			data[cols] = dummy_b[dummy_columns[1:len(dummy_columns)]]
+		#data['intercept'] = 1.0
 		columns = data.columns
 		y = columns[0]
 		x = columns[1:len(columns)]
@@ -373,7 +410,12 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 
 		# Logistic Regression technique where the dependent variable is a binary variable (yes/no) to predict the probability (from 0 to 1) that a prospect will become a customer.
 		self.actionCustomer_Acquisition_Binary.triggered.connect(self.Customer_Acquisition_Binary)
+		
+		# Stochastic Gradient Boosting technique where the dependent variable is a binary variable (yes/no) to predict the probability (from 0 to 1) that a customer will attrite (leave).
+		self.actionCustomer_Retention_SGB.triggered.connect(self.Customer_Retention_SGB)
 
+		#Logistic Regression technique where the dependent variable is a binary variable (yes/no) to predict the probability (from 0 to 1) that a customer will attrite.
+		self.actionCustomer_Retention_Binary_Logistics.triggered.connect(self.Customer_Retention_Binary_Logistics)
 
 	
 	def Forcast_SGB(self):
@@ -390,6 +432,14 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		self.createNonselectedTable()
 	def Customer_Acquisition_Binary(self):
 		self.predictModel = "Customer_Acquisition_Binary"
+		self.createSelectedTable()
+		self.createNonselectedTable()
+	def Customer_Retention_SGB(self):
+		self.predictModel = "Customer_Retention_SGB"
+		self.createSelectedTable()
+		self.createNonselectedTable()
+	def Customer_Retention_Binary_Logistics(self):
+		self.predictModel = "Customer_Retention_Binary_Logistics"
 		self.createSelectedTable()
 		self.createNonselectedTable()
 
