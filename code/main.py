@@ -25,6 +25,7 @@ import time
 import unicodedata
 import time
 import sklearn.linear_model
+from sklearn import feature_selection
 
 
 matchers = ['Net','Val','Amnt','Amt','Avg','Num','Tot','Avail','Min','Max']
@@ -50,7 +51,7 @@ class StochasticDialog(QDialog,form):
     	dialog = StochasticDialog(parent)
         result = dialog.exec_()
         d = {}
-        
+
         loss=str(dialog.loss.currentText())
         d["loss"]=loss
         learning_rate=float(dialog.learning_rate.text())
@@ -59,11 +60,11 @@ class StochasticDialog(QDialog,form):
         d["n_estimators"] = n_estimators
         subsample = float(dialog.subsample.text())
         d["subsample"] = (subsample)
-        
-        d["min_samples_split"] = int(dialog.min_samples_split.text()) 
-        d["min_samples_leaf"] = int(dialog.min_samples_leaf.text()) 
+
+        d["min_samples_split"] = int(dialog.min_samples_split.text())
+        d["min_samples_leaf"] = int(dialog.min_samples_leaf.text())
         d["min_weight_fraction_leaf"] = float(dialog.min_weight_fraction_leaf.text())
-        d["max_depth"] = int(dialog.max_depth.text()) 
+        d["max_depth"] = int(dialog.max_depth.text())
         init=None
         d["random_state"] = int(dialog.random_state.currentText())
         max_features = str(dialog.max_features.text())
@@ -77,12 +78,12 @@ class StochasticDialog(QDialog,form):
         	d["max_leaf_nodes"]=int(dialog.max_leaf_nodes.text())
         warm_start=str(dialog.warm_start.currentText())
         if warm_start!="False":
-        	d["warm_start"]=False 
+        	d["warm_start"]=False
         else:
         	d["warm_start"]=True
 
         #print loss,learning_rate,n_estimators,subsample,min_samples_split,min_samples_leaf,min_weight_fraction_leaf,max_depth,random_state,max_features,alpha,verbose,max_leaf_nodes,warm_start
-        
+
         return d
 
 class MyWindowClass(QtGui.QMainWindow, form_class):
@@ -99,7 +100,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 	category = ["Categorical","Numerical"]
 
 
-	
+
 	def __init__(self, parent=None):
 
 		QtGui.QMainWindow.__init__(self, parent)
@@ -108,7 +109,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		self.resetTemp()
 		self.setUpModel()
 		self.label.setVisible(False)
-		
+
 
 		self.toolButton_2.clicked.connect(self.removeFromNonSelected)
 		self.toolButton.clicked.connect(self.removeFromSelected)
@@ -121,13 +122,17 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		#QtCore.QObject.connect(self.tableView_3, QtCore.SIGNAL("clicked(QModelIndex)"), self.cellClickedNonSelectedTable)
 		#QtCore.QObject.connect(self.tableView_5, QtCore.SIGNAL("clicked(QModelIndex)"), self.cellClickedSelectedTable)
 
+
+
+	
+
 	def generateModel(self):
 
 		yName = []
 
 		yName.append(str(self.comboBox.currentText()))
 		xNames = self.SelectedVariables
-		
+
 		self.textEdit.clear()
 		if self.predictModel == "Binary_Logistics_Regression":
 			self.LogisticRegression(xNames,yName)
@@ -136,13 +141,12 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 
 		if self.predictModel == "Stochastic_Gradient_boosting":
 			self.stochasticGradienBoosting(xNames,yName)
-		if self.predictModel == "Forcast_SGB_Regressor":
-			self.stochasticGradienBoosting(xNames,yName)
-		if self.predictModel == "Forcast_Linear":
-			self.LinearRegression(xNames,yName)
-			
 		if self.predictModel == "Business_Forcast_SGB":
-			self.stochasticGradienBoostingClassifier(xNames,yName)
+			self.stochasticGradienBoostingRegressor(xNames,yName)
+		if self.predictModel == "Business_Forcast_Linear":
+			self.Business_Forcast_Linear(xNames,yName)
+
+		
 		if self.predictModel == "Customer_Acquisition_Binary":
 			self.LogisticRegression(xNames,yName)
 		if self.predictModel == "Customer_Retention_SGB":
@@ -152,27 +156,22 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 			self.LogisticRegression(xNames,yName)
 
 
-
-
-
-
-
-	def stochasticGradienBoosting(self,xNames,yNames):
+	def stochasticGradienBoostingRegressor(self,xNames,yNames):
 		d= StochasticDialog.getParams()
 		names = yNames+xNames
 		dff = self.data[names]
-		for i in xNames:
-			if dff[i].dtype=='object':
-				fillvalue = dff[i].value_counts()
-				fillvalue = fillvalue.index[0]
-			else:
-				fillvalue = np.mean(dff[i])
-			dff[i] = dff[i].fillna(fillvalue)
-		for i in yNames:
-			fillvalue = dff[i].value_counts()
-			fillvalue = fillvalue.index[0]
-			dff[i] = dff[i].fillna(fillvalue)
-		
+		"""for i in xNames:
+									if dff[i].dtype=='object':
+										fillvalue = dff[i].value_counts()
+										fillvalue = fillvalue.index[0]
+									else:
+										fillvalue = np.mean(dff[i])
+									dff[i] = dff[i].fillna(fillvalue)
+								for i in yNames:
+									fillvalue = dff[i].value_counts()
+									fillvalue = fillvalue.index[0]
+									dff[i] = dff[i].fillna(fillvalue)"""
+
 		for i in names:
 			if dff[i].dtype == "object":
 				dff[i] = pd.DataFrame(data={i: np.unique(dff[i],return_inverse=True)[1]})
@@ -203,7 +202,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 			fillvalue = dff[i].value_counts()
 			fillvalue = fillvalue.index[0]
 			dff[i] = dff[i].fillna(fillvalue)
-		
+
 		for i in names:
 			if dff[i].dtype == "object":
 				dff[i] = pd.DataFrame(data={i: np.unique(dff[i],return_inverse=True)[1]})
@@ -277,42 +276,54 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 
 		self.textEdit.append(str(a))
 		self.textEdit.append("\n")
-		#logit = sm.Logit(data[y], data[x])
-		#result = logit.fit()
-		#print result.summary()
-		#print result.summary()
-		#print result.conf_int()
-		#print np.exp(result.params)
-		"""
-		
 		
 
-		a = data.describe()
-		self.textEdit.append(str(a))
-		self.textEdit.append("\n")
 
-		a = data.std()
-		self.textEdit.append(str(a))
-		self.textEdit.append("\n")
+	def Business_Forcast_Linear(self,x,y):
+		lst = list(set(y + x))
+		ddf = self.data[lst]
+		#x=["COST","Gender",'Age','Education']
+		#y=["CLICKS"]
+		for i in x:
+			if ddf[i].dtype=='object':
+				fillvalue = ddf[i].value_counts()
+				fillvalue = fillvalue.index[0]
+			else:
+				fillvalue = np.mean(ddf[i])
+			ddf[i] = ddf[i].fillna(fillvalue)
+		for i in y:
+			fillvalue = ddf[i].value_counts()
+			fillvalue = fillvalue.index[0]
+			ddf[i] = ddf[i].fillna(fillvalue)
+		categorical = []
+		nonCategorical = []
+		for i in x:
+			if ddf[i].dtype=="object":
+				categorical.append(i)
+				print i
+			else:
+				print i
+				nonCategorical.append(i)
+		data = ddf[y+nonCategorical]
+		for j in categorical:
+			#dummy_b = self.get_dummies(ddf,j)
+			dummy_b = pd.get_dummies(ddf[j],prefix=j)
+			dummy_columns = dummy_b.columns
+			cols = list(dummy_columns[1:len(dummy_columns)])
+			data[cols] = dummy_b[dummy_columns[1:len(dummy_columns)]]
+		#data['intercept'] = 1.0
+		columns = data.columns
+		y = columns[0]
+		x = columns[1:len(columns)]
+		print data.head()
+		X = data[x].as_matrix()
+		Y = data[y].as_matrix()
+		model = sklearn.linear_model.LinearRegression()
+		model.fit(X,Y)
+		a = model.coef_
 
-		a = data.hist()
 		self.textEdit.append(str(a))
 		self.textEdit.append("\n")
-
-		a = result.summary()
-		self.textEdit.append(str(a))
-		self.textEdit.append("\n")
-
-		a = result.conf_int()
-		self.textEdit.append(str(a))
-		self.textEdit.append("\n")
-
-		a = np.exp(result.params)
-		self.textEdit.append(str(a))
-		self.textEdit.append("\n")
-		#self.predictModel=""
-		"""
-		
 
 
 	def LinearRegression(self,x,y):
@@ -369,7 +380,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		self.temp['col'] = self.tableWidget.currentItem().column()
 		self.temp['name'] = str(self.tableWidget.currentItem().text())
 		print self.temp
-		
+
 	def cellClickedSelectedTable(self):
 		self.temp['row'] = self.tableWidget_2.currentItem().row()
 		self.temp['col'] = self.tableWidget_2.currentItem().column()
@@ -380,56 +391,85 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		self.model = QtGui.QStandardItemModel(self)
 		self.model_selected = QtGui.QStandardItemModel(self)
 		self.model_nonselected = QtGui.QStandardItemModel(self)
-		#self.tableView.setModel(self.model)	
+		#self.tableView.setModel(self.model)
 
 		#self.tableView_3.setModel(self.model_nonselected)
 		#self.tableView_5.setModel(self.model_selected)
 		#self.tableView_3.horizontalHeader().setStretchLastSection(True)
 		#self.tableView_5.horizontalHeader().setStretchLastSection(True)
 
-		
+
 		#self.tableView.horizontalHeader().setStretchLastSection(True)
 
 
 	def setupToolbar(self):
+		self.connect(self.comboBox, QtCore.SIGNAL("currentIndexChanged(const QString&)"), self.load_select_variable)
 		self.actionRead_CSV.triggered.connect(self.readCSV)
 		self.actionRead_Excel.triggered.connect(self.readExcel)
 		self.actionRead_SPSS.triggered.connect(self.readSAV)
 		self.actionRead_SAS.triggered.connect(self.readSAS)
 		self.actionRead_STATA.triggered.connect(self.readSTATA)
 		self.actionRead_Tab_Delimited.triggered.connect(self.readTabCSV)
+		##Stochastic Gradient Boosting technique: dependent variable is a binary variable (yes/no) to predict the probability (from 0 to 1) that a prospect will become a customer.
+		self.actionBusiness_Forcast_SGB.triggered.connect(self.Business_Forcast_SGB)
+		self.actionBusiness_Forecast_Linear.triggered.connect(self.Business_Forcast_Linear)
+		# Logistic Regression technique where the dependent variable is a binary variable (yes/no) to predict the probability (from 0 to 1) that a prospect will become a customer.
+		self.actionCustomer_Acquisition_Binary.triggered.connect(self.Customer_Acquisition_Binary)
+		# Stochastic Gradient Boosting technique where the dependent variable is a binary variable (yes/no) to predict the probability (from 0 to 1) that a customer will attrite (leave).
+		self.actionCustomer_Retention_SGB.triggered.connect(self.Customer_Retention_SGB)
+		#Logistic Regression technique where the dependent variable is a binary variable (yes/no) to predict the probability (from 0 to 1) that a customer will attrite.
+		self.actionCustomer_Retention_Binary_Logistics.triggered.connect(self.Customer_Retention_Binary_Logistics)
 		self.actionCustomer_Acquisition_Binary_Logistics.triggered.connect(self.Binary_Logistics_Regression)
 		self.actionBusiness_Forcast_Linear.triggered.connect(self.Linear_Regression)
 		self.actionStochastic_Gradient_Boosting.triggered.connect(self.Stochastic_Gradient_boosting)
-		self.actionBusiness_Forecast_Linear.triggered.connect(self.Forcast_Linear)
 		#self.actionStochastic_Gradient_Boosting.triggered.connect(self.Stochastic_Gradient_boosting)
-		self.actionCustomer_Acquition_SGB.triggered.connect(self.Forcast_Linear)
+		#self.actionCustomer_Acquition_SGB.triggered.connect(self.Forcast_Linear)
+	def load_select_variable(self):
+		if self.predictModel!="":
+			available = self.nonSelectedVariables
+			available.remove(str(self.comboBox.currentText()))
+			categorical = []
+			nonCategorical = []
+			df = self.data.dropna(axis=1,how='all')
+			for i in available:
+				if df[i].dtype=="object":
+					categorical.append(i)
+					print i
+				else:
+					print i
+					nonCategorical.append(i)
+			varsbs = nonCategorical
+			x = df[varsbs].as_matrix()
+			y = df[str(self.comboBox.currentText())].as_matrix()
+			F,pval = feature_selection.f_regression(x,y)
 
-		##Stochastic Gradient Boosting technique: dependent variable is a binary variable (yes/no) to predict the probability (from 0 to 1) that a prospect will become a customer. 
-		self.actionBusiness_Forcast_SGB.triggered.connect(self.Business_Forcast_SGB)
+			
 
-		# Logistic Regression technique where the dependent variable is a binary variable (yes/no) to predict the probability (from 0 to 1) that a prospect will become a customer.
-		self.actionCustomer_Acquisition_Binary.triggered.connect(self.Customer_Acquisition_Binary)
-		
-		# Stochastic Gradient Boosting technique where the dependent variable is a binary variable (yes/no) to predict the probability (from 0 to 1) that a customer will attrite (leave).
-		self.actionCustomer_Retention_SGB.triggered.connect(self.Customer_Retention_SGB)
+			for i in range(0,len(pval)):
+				if pval[i]<0.05:
+					self.SelectedVariables.append(varsbs[i])
+					self.nonSelectedVariables.remove(varsbs[i])
 
-		#Logistic Regression technique where the dependent variable is a binary variable (yes/no) to predict the probability (from 0 to 1) that a customer will attrite.
-		self.actionCustomer_Retention_Binary_Logistics.triggered.connect(self.Customer_Retention_Binary_Logistics)
 
-	
-	def Forcast_SGB(self):
-		self.predictModel = "Forcast_SGB_Regressor"
-		self.createSelectedTable()
-		self.createNonselectedTable()
-	def Forcast_Linear(self):
-		self.predictModel = "Forcast_Linear"
-		self.createSelectedTable()
-		self.createNonselectedTable()
+
+
+
+
+
+
 	def Business_Forcast_SGB(self):
 		self.predictModel = "Business_Forcast_SGB"
 		self.createSelectedTable()
 		self.createNonselectedTable()
+	def Business_Forcast_Linear(self):
+		self.predictModel = "Business_Forcast_Linear"
+		self.createSelectedTable()
+		self.createNonselectedTable()
+	"""def Business_Forcast_SGB(self):
+					self.predictModel = "Business_Forcast_SGB"
+					self.createSelectedTable()
+					self.createNonselectedTable()
+	"""
 	def Customer_Acquisition_Binary(self):
 		self.predictModel = "Customer_Acquisition_Binary"
 		self.createSelectedTable()
@@ -470,7 +510,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 			for j in range(len(df.columns)):
 				self.tableWidget_3.setItem(i,j,QtGui.QTableWidgetItem(str(df.iget_value(i, j))))
 		self.tableWidget_3.setHorizontalHeaderLabels(l)
-		
+
 		self.headerName = l
 		self.nonSelectedVariables = self.headerName
 		self.data = df
@@ -479,7 +519,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		self.label.setVisible(True)
 		self.initDict()
 		self.initComboBox()
-	
+
 
 	def loadSAS(self):
 		try:
@@ -488,7 +528,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		except:
 			print "Unexpected error occured"
 			return
-		
+
 
 		l = list(df.columns)
 		print l
@@ -507,7 +547,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 			for j in range(len(df.columns)):
 				self.tableWidget_3.setItem(i,j,QtGui.QTableWidgetItem(str(df.iget_value(i, j))))
 		self.tableWidget_3.setHorizontalHeaderLabels(l)
-		
+
 		self.headerName = l
 		self.nonSelectedVariables = self.headerName
 		self.data = df
@@ -519,7 +559,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 
 
 
-		
+
 
 	def str_to_type (self,s):
 		try:
@@ -562,7 +602,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 			for j in range(len(df.columns)):
 				self.tableWidget_3.setItem(i,j,QtGui.QTableWidgetItem(str(df.iget_value(i, j))))
 		self.tableWidget_3.setHorizontalHeaderLabels(l)
-		
+
 		self.headerName = l
 		self.nonSelectedVariables = self.headerName
 		self.data = df
@@ -573,7 +613,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		self.initComboBox()
 
 
-	
+
 	def loadSAV(self):
 
 		raw_data = savReaderWriter.SavReader(str(self.filename), returnHeader = True) # This is fast
@@ -602,7 +642,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 			for j in range(len(df.columns)):
 				self.tableWidget_3.setItem(i,j,QtGui.QTableWidgetItem(str(df.iget_value(i, j))))
 		self.tableWidget_3.setHorizontalHeaderLabels(l)
-		
+
 		self.headerName = l
 		self.nonSelectedVariables = self.headerName
 		self.data = df
@@ -624,7 +664,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		print data.head()
 
 
-		
+
 		self.setUpModel()
 		b= []
 
@@ -635,7 +675,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 			for row in reader:
 				items = [QtGui.QStandardItem(str(field)) for field in row]
 				self.model.appendRow(items)
-				
+
 				for ii in row:
 					rr = []
 					if self.str_to_type(ii)==float:
@@ -648,7 +688,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 				b.append(row)
 			for j in header:
 				self.headerName.append(j)
-		
+
 		self.comboBox.clear()
 		for text in self.headerName:
 			self.comboBox.addItem(text)
@@ -687,7 +727,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 	def removeNonAscii(self,s):
 		return "".join(i for i in s if ord(i)<128)
 
-		
+
 
 	def loadCsv(self):
 
@@ -717,7 +757,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		head.setStretchLastSection(True)
 		nrow = len(df.index)
 		if nrow>100:
-			
+
 			nrow = 100
 		else:
 			nrow = nrow
@@ -730,14 +770,27 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 				self.tableWidget_3.setItem(i,j,QtGui.QTableWidgetItem(str(df.iget_value(i, j))))
 		self.tableWidget_3.setHorizontalHeaderLabels(l)
 		
+
 		self.headerName = l
 		self.nonSelectedVariables = self.headerName
 		self.data = df
+		self.fillMissingValue()
 		st = str(nrow)+" of "+str(len(df.index))+" rows has been shown"
 		self.label.setText(st)
 		self.label.setVisible(True)
 		self.initDict()
 		self.initComboBox()
+
+
+	def fillMissingValue(self):
+		for i in self.headerName:
+			if self.data[i].dtype=='object':
+				fillvalue = self.data[i].value_counts()
+				fillvalue = fillvalue.index[0]
+			else:
+				fillvalue = np.mean(self.data[i])
+			self.data[i] = self.data[i].fillna(fillvalue)
+		print self.data.isnull().any().any()
 
 
 	def initComboBox(self):
@@ -824,7 +877,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		except ValueError:
 			print "something Went wrong"
 
-		
+
 		print self.filename
 		self.loadSAS()
 	def readSTATA(self):
@@ -833,7 +886,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 			self.filename = QtGui.QFileDialog.getOpenFileName(self, 'Open File',".","(*.dta)")
 		except ValueError:
 			print "something Went wrong"
-		
+
 		print self.filename
 		self.loadSTATA()
 
@@ -937,8 +990,8 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 
 
 
-		
-	
+
+
 	def removeFromNonSelected(self):
 
 		if self.temp['name'] !="":
@@ -958,7 +1011,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 			self.nonSelectedVariables.remove(self.temp['name'])
 			self.SelectedVariables.append(self.temp['name'])
 
-			#print self.nonSelectedVariables 
+			#print self.nonSelectedVariables
 			#print self.SelectedVariables
 
 			self.resetTemp()
@@ -977,11 +1030,11 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 			self.tableWidget.setItem(n, 0, item)
 			self.tableWidget.setCellWidget(n,1,combo)
 			combo.currentIndexChanged.connect(partial(self.categoryChangedNonSelected, n))
-			
+
 			self.SelectedVariables.remove(self.temp['name'])
 			self.nonSelectedVariables.append(self.temp['name'])
 			print self.SelectedVariables
-			#print self.nonSelectedVariables 
+			#print self.nonSelectedVariables
 			#print self.SelectedVariables
 			self.resetTemp()
 #from tr import DateDialog
@@ -989,35 +1042,4 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 app = QtGui.QApplication(sys.argv)
 myWindow = MyWindowClass(None)
 myWindow.show()
-
-
-"""
-kwfdkfj
-fkajsdfds
-print f hellow world
-print hellow world
-print hellow worldpritnt hellow worldpritnt
-print hellow worldpritnt
-print hellow worldpritnt
-print this is my sample columnheaders
-print hellow worldpritnt
-print hellow worldpritnt
-print hellow worldpritnt
-print hellow worldpritnt
-print hellow worldpritnt
-print hellow worldpritnt
-print hellow worldpritnt
-
-print hellow worldpritnt
-print hellow worldpritnt
-print hellow worldpritnt
-print hellow worldpritnt
-
-
-
-dkafhgprint ff tunks
-lkjfwu
-
-
-"""
 app.exec_()
