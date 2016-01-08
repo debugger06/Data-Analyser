@@ -7,4 +7,3 @@ This is a predictive modeling application that will automatically generate a pre
 This is written in Python programming language. Where possible, integrate Sklearn, pandas  such that instead of writing code from scratch, it may be possible do all operations in sophisticated GUI.  For example, packages have been written to generate CART and Stochastic Gradient Boosting (SGB) models.
 More customisation coming
 Need to implement new methods
-some problem fixed
