@@ -91,6 +91,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 	filename = ""
 	predictModel = ""
 	headerName = []
+	runnable = {}
 	nonSelectedVariables = []
 	SelectedVariables = []
 	#data = np.zeros((0,0),float)
@@ -124,7 +125,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 
 
 
-	
+
 
 	def generateModel(self):
 
@@ -134,6 +135,13 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		xNames = self.SelectedVariables
 
 		self.textEdit.clear()
+
+		if self.predictModel == "Business_Forcast_SGB":
+			self.stochasticGradienBoostingRegressor(xNames,yName)
+		if self.predictModel == "Business_Forcast_Linear":
+			self.Business_Forcast_LinearModel(xNames,yName)
+
+
 		if self.predictModel == "Binary_Logistics_Regression":
 			self.LogisticRegression(xNames,yName)
 		if self.predictModel == "Linear_Regression":
@@ -141,12 +149,8 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 
 		if self.predictModel == "Stochastic_Gradient_boosting":
 			self.stochasticGradienBoosting(xNames,yName)
-		if self.predictModel == "Business_Forcast_SGB":
-			self.stochasticGradienBoostingRegressor(xNames,yName)
-		if self.predictModel == "Business_Forcast_Linear":
-			self.Business_Forcast_Linear(xNames,yName)
 
-		
+
 		if self.predictModel == "Customer_Acquisition_Binary":
 			self.LogisticRegression(xNames,yName)
 		if self.predictModel == "Customer_Retention_SGB":
@@ -160,17 +164,6 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		d= StochasticDialog.getParams()
 		names = yNames+xNames
 		dff = self.data[names]
-		"""for i in xNames:
-									if dff[i].dtype=='object':
-										fillvalue = dff[i].value_counts()
-										fillvalue = fillvalue.index[0]
-									else:
-										fillvalue = np.mean(dff[i])
-									dff[i] = dff[i].fillna(fillvalue)
-								for i in yNames:
-									fillvalue = dff[i].value_counts()
-									fillvalue = fillvalue.index[0]
-									dff[i] = dff[i].fillna(fillvalue)"""
 
 		for i in names:
 			if dff[i].dtype == "object":
@@ -276,10 +269,10 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 
 		self.textEdit.append(str(a))
 		self.textEdit.append("\n")
-		
 
 
-	def Business_Forcast_Linear(self,x,y):
+
+	def Business_Forcast_LinearModel(self,x,y):
 		lst = list(set(y + x))
 		ddf = self.data[lst]
 		#x=["COST","Gender",'Age','Education']
@@ -420,7 +413,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		#Logistic Regression technique where the dependent variable is a binary variable (yes/no) to predict the probability (from 0 to 1) that a customer will attrite.
 		self.actionCustomer_Retention_Binary_Logistics.triggered.connect(self.Customer_Retention_Binary_Logistics)
 		self.actionCustomer_Acquisition_Binary_Logistics.triggered.connect(self.Binary_Logistics_Regression)
-		self.actionBusiness_Forcast_Linear.triggered.connect(self.Linear_Regression)
+		#self.actionBusiness_Forcast_Linear.triggered.connect(self.Linear_Regression)
 		self.actionStochastic_Gradient_Boosting.triggered.connect(self.Stochastic_Gradient_boosting)
 		#self.actionStochastic_Gradient_Boosting.triggered.connect(self.Stochastic_Gradient_boosting)
 		#self.actionCustomer_Acquition_SGB.triggered.connect(self.Forcast_Linear)
@@ -443,7 +436,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 			y = df[str(self.comboBox.currentText())].as_matrix()
 			F,pval = feature_selection.f_regression(x,y)
 
-			
+
 
 			for i in range(0,len(pval)):
 				if pval[i]<0.05:
@@ -451,8 +444,31 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 					self.nonSelectedVariables.remove(varsbs[i])
 
 
+	def provideSuggestion(self):
+		y = str(self.comboBox.currentText())
+		xList = self.headerName
+		xList.remove(y)
+		"""
+		for i in xList:
+			if !self.runnable[i]:
 
 
+		ddf = self.data[lst]
+		#x=["COST","Gender",'Age','Education']
+		#y=["CLICKS"]
+		categorical = []
+		nonCategorical = []
+		for i in x:
+			if ddf[i].dtype=="object":
+				categorical.append(i)
+				print i
+			else:
+				print i
+				nonCategorical.append(i)
+		data = ddf[y+nonCategorical]
+
+		"""
+			
 
 
 
@@ -463,13 +479,10 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		self.createNonselectedTable()
 	def Business_Forcast_Linear(self):
 		self.predictModel = "Business_Forcast_Linear"
+		#self.provideSuggestion()
 		self.createSelectedTable()
 		self.createNonselectedTable()
-	"""def Business_Forcast_SGB(self):
-					self.predictModel = "Business_Forcast_SGB"
-					self.createSelectedTable()
-					self.createNonselectedTable()
-	"""
+	
 	def Customer_Acquisition_Binary(self):
 		self.predictModel = "Customer_Acquisition_Binary"
 		self.createSelectedTable()
@@ -653,72 +666,6 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		self.initComboBox()
 
 
-
-
-
-		"""
-		raw_data_list = list(raw_data) # this is slow
-		data = pd.DataFrame(raw_data_list) # this is slow
-		data = data.rename(columns=data.loc[0]).iloc[1:] # setting columnheaders, this is slow too.
-
-		print data.head()
-
-
-
-		self.setUpModel()
-		b= []
-
-		savFileName = "ACME Predicter sample data - SPSS.sav"
-		with savReaderWriter.SavReader(savFileName, returnHeader=True) as reader:
-			header = next(reader)
-
-			for row in reader:
-				items = [QtGui.QStandardItem(str(field)) for field in row]
-				self.model.appendRow(items)
-
-				for ii in row:
-					rr = []
-					if self.str_to_type(ii)==float:
-						rr.append(float(ii))
-					elif self.str_to_type(ii)==int:
-						rr.append(int(ii))
-					else:
-						rr.append(ii)
-
-				b.append(row)
-			for j in header:
-				self.headerName.append(j)
-
-		self.comboBox.clear()
-		for text in self.headerName:
-			self.comboBox.addItem(text)
-		self.model.setHorizontalHeaderLabels(self.headerName)
-		self.data = pd.DataFrame.from_records(b, columns=self.headerName)
-		"""
-	"""
-	def read_csv(self,file_path):
-		header = []
-		i=0
-		with open(file_path) as f:
-			#h = str(f.readline())
-			#head = header.split(",")
-			#header.append([str(x) for x in head])
-			#print h
-
-
-			data = []
-
-			for line in f:
-				line = line.strip().split(",")
-				if i == 0:
-					header.append([str(x) for x in line])
-					i=1
-
-				data.append([str(x) for x in line])
-		#print data
-		#return 0
-		return pd.DataFrame.from_records(data, columns=header)
-	"""
 	def read_csv(self, file_path):
 		csv_chunks = pd.read_csv(str(file_path), chunksize = 10000)
 		df = pd.concat(chunk for chunk in csv_chunks)
@@ -728,15 +675,9 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		return "".join(i for i in s if ord(i)<128)
 
 
-
 	def loadCsv(self):
 
-		#self.setUpModel()
-
 		df = self.read_csv(self.filename)
-
-		#df  = self.read_csv(str(self.filename))
-
 
 		"""
 
@@ -752,7 +693,15 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		l = []
 		for ii in ll:
 			l.append(self.removeNonAscii(ii))
+			self.runnable[ii] = True
 		df.columns = l
+		print len(l)
+
+		for i in l:
+			if df[i].dtype == "object" and len(df[i].unique())>30:
+				self.runnable[i] = False
+
+
 		head = self.tableWidget_3.horizontalHeader()
 		head.setStretchLastSection(True)
 		nrow = len(df.index)
@@ -769,7 +718,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 			for j in range(len(df.columns)):
 				self.tableWidget_3.setItem(i,j,QtGui.QTableWidgetItem(str(df.iget_value(i, j))))
 		self.tableWidget_3.setHorizontalHeaderLabels(l)
-		
+
 
 		self.headerName = l
 		self.nonSelectedVariables = self.headerName
@@ -790,7 +739,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 			else:
 				fillvalue = np.mean(self.data[i])
 			self.data[i] = self.data[i].fillna(fillvalue)
-		print self.data.isnull().any().any()
+		print "Any Missing value: ",self.data.isnull().any().any()
 
 
 	def initComboBox(self):
@@ -951,12 +900,10 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 
 		self.tableWidget.setRowCount(len(self.nonSelectedVariables))
 		self.tableWidget.setColumnCount(2)
-		print len(self.nonSelectedVariables)
+		#print len(self.nonSelectedVariables)
 
 		for i in range(0,len(self.nonSelectedVariables)):
-			print self.nonSelectedVariables[i]
 			item = QtGui.QTableWidgetItem(self.nonSelectedVariables[i])
-			print item
 			self.tableWidget.setItem(i, 0, item)
 			combo = QtGui.QComboBox()
 			for t in self.category:
@@ -970,11 +917,11 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 	def categoryChangedNonSelected(self,rowIndex, comboBoxIndex):
 		itemname = self.tableWidget.item(rowIndex,0)
 		self.var_type[str(itemname.text())]=self.category[comboBoxIndex]
-		print self.var_type
+		#print self.var_type
 	def categoryChangedSelected(self,rowIndex, comboBoxIndex):
 		itemname = self.tableWidget_2.item(rowIndex,0)
 		self.var_type[str(itemname.text())]=self.category[comboBoxIndex]
-		print self.var_type
+		#print self.var_type
 
 
 	def resetTemp(self):
