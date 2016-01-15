@@ -114,6 +114,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 
 		self.toolButton_2.clicked.connect(self.removeFromNonSelected)
 		self.toolButton.clicked.connect(self.removeFromSelected)
+		self.pushButton_2.clicked.connect(self.provideSuggestion)
 		self.pushButton.clicked.connect(self.generateModel)
 
 		QtCore.QObject.connect(self.tableWidget, QtCore.SIGNAL("clicked(QModelIndex)"), self.cellClickedNonSelectedTable)
@@ -122,9 +123,6 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 
 		#QtCore.QObject.connect(self.tableView_3, QtCore.SIGNAL("clicked(QModelIndex)"), self.cellClickedNonSelectedTable)
 		#QtCore.QObject.connect(self.tableView_5, QtCore.SIGNAL("clicked(QModelIndex)"), self.cellClickedSelectedTable)
-
-
-
 
 
 	def generateModel(self):
@@ -434,6 +432,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 			varsbs = nonCategorical
 			x = df[varsbs].as_matrix()
 			y = df[str(self.comboBox.currentText())].as_matrix()
+			"""
 			F,pval = feature_selection.f_regression(x,y)
 
 
@@ -442,29 +441,40 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 				if pval[i]<0.05:
 					self.SelectedVariables.append(varsbs[i])
 					self.nonSelectedVariables.remove(varsbs[i])
+			"""
 
 
 	def provideSuggestion(self):
 		y = str(self.comboBox.currentText())
 		xList = self.headerName
 		xList.remove(y)
-		for i in xList:
-			if !self.runnable[i]:
 
 
-		ddf = self.data[lst]
+		ddf = self.data[xList]
 		#x=["COST","Gender",'Age','Education']
 		#y=["CLICKS"]
 		categorical = []
 		nonCategorical = []
-		for i in x:
-			if ddf[i].dtype=="object":
-				categorical.append(i)
-				print i
-			else:
-				print i
-				nonCategorical.append(i)
-		data = ddf[y+nonCategorical]
+		for i in xList:
+			if self.runnable:
+				if ddf[i].dtype=="object":
+					categorical.append(i)
+				else:
+					nonCategorical.append(i)
+		df = self.data[nonCategorical]
+
+		for j in categorical:
+			#dummy_b = self.get_dummies(ddf,j)
+			dummy_b = pd.get_dummies(ddf[j],prefix=j)
+			dummy_columns = dummy_b.columns
+			cols = list(dummy_columns[1:len(dummy_columns)])
+			df[cols] = dummy_b[dummy_columns[1:len(dummy_columns)]]
+
+		X = df.as_matrix()
+		Y = self.data[y].as_matrix()
+		F, pval = feature_selection.f_regression(X, Y)
+
+		
 
 			
 
@@ -477,7 +487,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		self.createNonselectedTable()
 	def Business_Forcast_Linear(self):
 		self.predictModel = "Business_Forcast_Linear"
-		#self.provideSuggestion()
+		self.provideSuggestion()
 		self.createSelectedTable()
 		self.createNonselectedTable()
 	
@@ -727,6 +737,11 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		self.label.setVisible(True)
 		self.initDict()
 		self.initComboBox()
+
+	#def preparedata(self):
+
+
+
 
 
 	def fillMissingValue(self):
