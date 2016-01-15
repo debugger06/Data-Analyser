@@ -448,7 +448,6 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		y = str(self.comboBox.currentText())
 		xList = self.headerName
 		xList.remove(y)
-		"""
 		for i in xList:
 			if !self.runnable[i]:
 
@@ -467,7 +466,6 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 				nonCategorical.append(i)
 		data = ddf[y+nonCategorical]
 
-		"""
 			
 
 
