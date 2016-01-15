@@ -447,7 +447,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 	def provideSuggestion(self):
 		y = str(self.comboBox.currentText())
 		xList = self.headerName
-		xList.remove(y)
+		#xList.remove(y)
 
 
 		ddf = self.data[xList]
@@ -468,11 +468,13 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 			dummy_b = pd.get_dummies(ddf[j],prefix=j)
 			dummy_columns = dummy_b.columns
 			cols = list(dummy_columns[1:len(dummy_columns)])
+			print cols
 			df[cols] = dummy_b[dummy_columns[1:len(dummy_columns)]]
 
 		X = df.as_matrix()
 		Y = self.data[y].as_matrix()
 		F, pval = feature_selection.f_regression(X, Y)
+		print pval
 
 		
 
@@ -487,7 +489,6 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		self.createNonselectedTable()
 	def Business_Forcast_Linear(self):
 		self.predictModel = "Business_Forcast_Linear"
-		self.provideSuggestion()
 		self.createSelectedTable()
 		self.createNonselectedTable()
 	
