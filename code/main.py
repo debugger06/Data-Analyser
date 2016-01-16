@@ -35,6 +35,15 @@ matchers2 = ['Typ','Type']
 form_class = uic.loadUiType("main.ui")[0]                 # Load the UI
 
 form = uic.loadUiType("dialog.ui")[0]
+
+
+class LazyDict(dict):
+	def keylist(self, keys, value):
+		for key in keys:
+			self[key] = value
+
+
+
 class StochasticDialog(QDialog,form):
     def __init__(self, parent = None):
         super(StochasticDialog, self).__init__(parent)
@@ -275,17 +284,6 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		ddf = self.data[lst]
 		#x=["COST","Gender",'Age','Education']
 		#y=["CLICKS"]
-		for i in x:
-			if ddf[i].dtype=='object':
-				fillvalue = ddf[i].value_counts()
-				fillvalue = fillvalue.index[0]
-			else:
-				fillvalue = np.mean(ddf[i])
-			ddf[i] = ddf[i].fillna(fillvalue)
-		for i in y:
-			fillvalue = ddf[i].value_counts()
-			fillvalue = fillvalue.index[0]
-			ddf[i] = ddf[i].fillna(fillvalue)
 		categorical = []
 		nonCategorical = []
 		for i in x:
@@ -394,7 +392,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 
 
 	def setupToolbar(self):
-		self.connect(self.comboBox, QtCore.SIGNAL("currentIndexChanged(const QString&)"), self.load_select_variable)
+		#Fself.connect(self.comboBox, QtCore.SIGNAL("currentIndexChanged(const QString&)"), self.load_select_variable)
 		self.actionRead_CSV.triggered.connect(self.readCSV)
 		self.actionRead_Excel.triggered.connect(self.readExcel)
 		self.actionRead_SPSS.triggered.connect(self.readSAV)
@@ -415,44 +413,17 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		self.actionStochastic_Gradient_Boosting.triggered.connect(self.Stochastic_Gradient_boosting)
 		#self.actionStochastic_Gradient_Boosting.triggered.connect(self.Stochastic_Gradient_boosting)
 		#self.actionCustomer_Acquition_SGB.triggered.connect(self.Forcast_Linear)
-	def load_select_variable(self):
-		if self.predictModel!="":
-			available = self.nonSelectedVariables
-			available.remove(str(self.comboBox.currentText()))
-			categorical = []
-			nonCategorical = []
-			df = self.data.dropna(axis=1,how='all')
-			for i in available:
-				if df[i].dtype=="object":
-					categorical.append(i)
-					print i
-				else:
-					print i
-					nonCategorical.append(i)
-			varsbs = nonCategorical
-			x = df[varsbs].as_matrix()
-			y = df[str(self.comboBox.currentText())].as_matrix()
-			"""
-			F,pval = feature_selection.f_regression(x,y)
-
-
-
-			for i in range(0,len(pval)):
-				if pval[i]<0.05:
-					self.SelectedVariables.append(varsbs[i])
-					self.nonSelectedVariables.remove(varsbs[i])
-			"""
-
 
 	def provideSuggestion(self):
 		y = str(self.comboBox.currentText())
 		xList = self.headerName
-		#xList.remove(y)
+		xList.remove(y)
 
 
 		ddf = self.data[xList]
 		#x=["COST","Gender",'Age','Education']
 		#y=["CLICKS"]
+		vardict = LazyDict()
 		categorical = []
 		nonCategorical = []
 		for i in xList:
@@ -460,26 +431,33 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 				if ddf[i].dtype=="object":
 					categorical.append(i)
 				else:
+					vardict.keylist([i], i)
 					nonCategorical.append(i)
 		df = self.data[nonCategorical]
 
 		for j in categorical:
-			#dummy_b = self.get_dummies(ddf,j)
 			dummy_b = pd.get_dummies(ddf[j],prefix=j)
 			dummy_columns = dummy_b.columns
 			cols = list(dummy_columns[1:len(dummy_columns)])
-			print cols
+			vardict.keylist(cols, j)
 			df[cols] = dummy_b[dummy_columns[1:len(dummy_columns)]]
 
+		variables =  list(df.columns)
 		X = df.as_matrix()
 		Y = self.data[y].as_matrix()
 		F, pval = feature_selection.f_regression(X, Y)
-		print pval
+		final_variables = []
+		for i in range(0,len(pval)):
+			if(pval[i]<0.05):
+				if vardict[variables[i]] not in final_variables:
+					final_variables.append(vardict[variables[i]])
 
-		
-
-			
-
+		self.SelectedVariables = final_variables
+		self.nonSelectedVariables = [x for x in self.headerName if x not in final_variables]
+		print self.SelectedVariables
+		print self.nonSelectedVariables
+		self.createNonselectedTable()
+		self.createSelectedTable()
 
 
 
@@ -906,6 +884,17 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 		self.tableWidget_2.setRowCount(len(self.SelectedVariables))
 		self.tableWidget_2.setColumnCount(2)
 		self.tableWidget_2.setHorizontalHeaderLabels(['Selected Variables','type'])
+
+		for i in range(0,len(self.SelectedVariables)):
+			item = QtGui.QTableWidgetItem(self.SelectedVariables[i])
+			self.tableWidget_2.setItem(i, 0, item)
+			combo = QtGui.QComboBox()
+			for t in self.category:
+				combo.addItem(t)
+			index = combo.findText(self.var_type[self.SelectedVariables[i]])
+			combo.setCurrentIndex(index)
+			self.tableWidget_2.setCellWidget(i,1,combo)
+			combo.currentIndexChanged.connect(partial(self.categoryChangedSelected, i))
 
 
 	def createNonselectedTable(self):
